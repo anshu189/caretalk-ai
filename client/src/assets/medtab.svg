@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" style="enable-background:new 0 0 128 128" xml:space="preserve">
+  <!-- Upper Half in White -->
+  <defs>
+    <clipPath id="upperHalf">
+      <rect x="0" y="0" width="128" height="64" />
+    </clipPath>
+  </defs>
+  <path
+    style="fill:#FFFFFF; stroke:#12CA8F; stroke-width:1;"
+    clip-path="url(#upperHalf)"
+    d="M63.787.19c-16.371 0-30.841 13.305-30.841 29.684v68.251c0 16.38 14.47 29.684 30.841 29.684 16.351 0 30.821-13.305 30.821-29.684V29.874C94.608 13.495 80.138.19 63.787.19zm-22.62 29.684c0-11.938 10.688-21.645 22.62-21.645 11.912 0 22.6 9.707 22.6 21.645V64h-45.22V29.874z"
+  />
+  <!-- Lower Half in #12CA8F -->
+  <defs>
+    <clipPath id="lowerHalf">
+      <rect x="0" y="64" width="128" height="64" />
+    </clipPath>
+  </defs>
+  <path
+    style="fill:#12CA8F; stroke:#12CA8F; stroke-width:4;"
+    clip-path="url(#lowerHalf)"
+    d="M63.787.19c-16.371 0-30.841 13.305-30.841 29.684v68.251c0 16.38 14.47 29.684 30.841 29.684 16.351 0 30.821-13.305 30.821-29.684V29.874C94.608 13.495 80.138.19 63.787.19zm-22.62 29.684c0-11.938 10.688-21.645 22.62-21.645 11.912 0 22.6 9.707 22.6 21.645V64h-45.22V29.874z"
+  />
+</svg>

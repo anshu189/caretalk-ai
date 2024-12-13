@@ -18,7 +18,7 @@ if (!process.env.OPENAI_API_KEY || !process.env.GOOGLE_SPEECH_TO_TEXT_KEY) {
 }
 
 // Set the credentials for Google Cloud
-process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_SPEECH_TO_TEXT_KEY;
+process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 
 const app = express();
 app.use(cors());
@@ -73,8 +73,6 @@ wss.on('connection', (ws) => {
     } catch (err) {
       // Not JSON -> probably audio buffer
       const audioBuffer = Buffer.from(data);
-
-      // console.log("Audioo: ",audioBuffer)
 
       if (!recognizeStream) {
         recognizeStream = speechClient

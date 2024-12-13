@@ -268,15 +268,23 @@ const AudioRecorder = () => {
         </div>
 
         {/* Footer */}
-        <footer className="mt-5 lg:mt-12 text-white">
+        <footer className="mt-5 lg:mt-12 flex items-center justify-center gap-10 text-white">
           <a
             href="https://github.com/anshu189/caretalkai"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline underline-offset-2 flex items-center justify-center gap-2"
+            className="flex items-center justify-center gap-2"
           >
             Github
             <img src={linkicon} alt="Caretalkai - By anshu189 Github" className='size-4'/>
+          </a>
+          <a
+            href="https://github.com/anshu189/caretalkai/issues/new"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2"
+          >
+            Help
           </a>
         </footer>
       </div>

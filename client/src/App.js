@@ -26,10 +26,8 @@ const AudioRecorder = () => {
       const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
 
       // Connect to WebSocket (LOCAL DEV: ws://localhost:5000)
-      // On Render (SSL) use wss://your-app.onrender.com
-      // Or auto-detect:
       const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-      const host = window.location.host; // e.g. localhost:3000 or my-app.onrender.com
+      const host = window.location.host;
       wsRef.current = new WebSocket(protocol + host);
 
       wsRef.current.onopen = () => {
@@ -85,7 +83,7 @@ const AudioRecorder = () => {
       // Auto-stop after 5 seconds
       timerRef.current = setTimeout(() => {
         stopRecording();
-      }, 12000);
+      }, 5000);
 
     } catch (err) {
       console.error('Error accessing microphone:', err);

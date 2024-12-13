@@ -60,9 +60,9 @@ wss.on('connection', (ws) => {
   let originalLanguage = 'en-US'; // Default
   let translatedLanguage = 'hi-IN'; // Default
 
-  ws.on('message', (data) => {
+  ws.on('message', async (data) => {
     try {
-      // Parse JSON if it's language config
+      // Check if the incoming data is JSON (for language config updates)
       const parsedData = JSON.parse(data);
       if (parsedData.originalLanguage && parsedData.translatedLanguage) {
         originalLanguage = parsedData.originalLanguage;
@@ -71,10 +71,19 @@ wss.on('connection', (ws) => {
         return;
       }
     } catch (err) {
-      // Not JSON -> probably audio buffer
-      const audioBuffer = Buffer.from(data);
+      // Assume it's audio buffer if parsing fails
+      if (!(err instanceof SyntaxError)) {
+        console.error("Unexpected error while processing message:", err);
+        return;
+      }
+    }
 
-      if (!recognizeStream) {
+    // Process audio buffer (binary data)
+    const audioBuffer = Buffer.from(data);
+    
+    // Initialize recognizeStream if it's null
+    if (!recognizeStream) {
+      try {
         recognizeStream = speechClient
           .streamingRecognize({
             config: {
@@ -85,32 +94,54 @@ wss.on('connection', (ws) => {
             interimResults: true,
           })
           .on('data', async (response) => {
-            const transcription = response.results
-              .map((result) => result.alternatives[0].transcript)
-              .join('\n');
+            try {
+              const transcription = response.results
+                .map((result) => result.alternatives[0].transcript)
+                .join('\n');
 
-            // Translate + TTS for every chunk
-            const translatedText = await translateText(transcription, translatedLanguage);
-            const ttsAudioBase64 = await generateTTS(translatedText, translatedLanguage);
-
-            ws.send(JSON.stringify({
-              original: transcription,
-              translated: translatedText,
-              ttsAudioBase64
-            }));
+              // Translate and generate TTS audio
+              const translatedText = await translateText(transcription, translatedLanguage);
+              const ttsAudioBase64 = await generateTTS(translatedText, translatedLanguage);
+              // Debug
+              console.log('recognizeStream value:', !recognizeStream);
+              // Send results back to the client
+              ws.send(JSON.stringify({
+                original: transcription,
+                translated: translatedText,
+                ttsAudioBase64,
+              }));
+            } catch (innerError) {
+              console.error('Error during transcription processing:', innerError);
+              ws.send(JSON.stringify({ error: innerError.message }));
+            }
           })
           .on('error', (error) => {
             console.error('Error during streaming:', error);
             ws.send(JSON.stringify({ error: error.message }));
+            recognizeStream = null;
+          })
+          .on('end', () => {
+            console.log('Recognition stream ended');
+            recognizeStream = null;
           });
+      } catch (streamError) {
+        console.error('Error initializing recognizeStream:', streamError);
+        ws.send(JSON.stringify({ error: streamError.message }));
       }
+    }
 
-      if (recognizeStream) {
+    // If recognizeStream is active, write the audio buffer to it
+    // Debug
+    console.log("If recognizeStream: ", !recognizeStream);
+    if (recognizeStream) {
+      try {
         recognizeStream.write(audioBuffer);
+      } catch (writeError) {
+        console.error('Error writing to recognizeStream:', writeError);
+        ws.send(JSON.stringify({ error: writeError.message }));
       }
     }
   });
-
   ws.on('close', () => {
     console.log('WebSocket client disconnected');
     if (recognizeStream) recognizeStream.end();

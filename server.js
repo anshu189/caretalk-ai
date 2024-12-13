@@ -12,7 +12,7 @@ const OpenAI = require("openai");
 dotenv.config();
 
 // Validation for required ENV variables
-if (!process.env.OPENAI_API_KEY || !process.env.GOOGLE_SPEECH_TO_TEXT_KEY) {
+if (!process.env.OPENAI_API_KEY || !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
   console.error('Error: Missing required environment variables.');
   process.exit(1);
 }

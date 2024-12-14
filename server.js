@@ -61,7 +61,6 @@ wss.on('connection', (ws) => {
   let translatedLanguage = 'hi-IN'; // Default transalated lang
 
   ws.on('message', async (data) => {
-    console.log('Negated recognizeStream value:', !recognizeStream);
     try {
       // Check if the incoming data is JSON (for language config updates)
       const parsedData = JSON.parse(data);
@@ -81,9 +80,10 @@ wss.on('connection', (ws) => {
 
     // Process audio buffer (binary data)
     const audioBuffer = Buffer.from(data);
-    
+
     // Initialize recognizeStream if it's null
     if (!recognizeStream) {
+      console.log('Google Credentials:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
       console.log('Initializing new recognizeStream...');
       try {
         recognizeStream = speechClient
@@ -96,9 +96,9 @@ wss.on('connection', (ws) => {
             interimResults: true,
           })
           .on('data', async (response) => {
-            console.log("out data")
+            console.log("Data event received");
             try {
-              console.log("in data")
+              console.log('Transcription response:', response);
               const transcription = response.results
                 .map((result) => result.alternatives[0].transcript)
                 .join('\n');
@@ -135,6 +135,9 @@ wss.on('connection', (ws) => {
     }
 
     // If recognizeStream is active, write the audio buffer to it
+    // Debug
+    console.log('Audio Buffer Size:', audioBuffer.length);
+    console.log('Audio Buffer Data (first 10 bytes):', audioBuffer.slice(0, 10));
     if (recognizeStream) {
       try {
         recognizeStream.write(audioBuffer);

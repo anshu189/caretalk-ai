@@ -55,12 +55,14 @@ console.log('WebSocket server attached.');
 
 // Setup real-time transcription & translation
 wss.on('connection', (ws) => {
-  // console.log('Client connected for real-time transcription and translation');
+  console.log('Client connected for real-time transcription and translation');
   let recognizeStream = null;
-  let originalLanguage = 'en-US'; // Default
-  let translatedLanguage = 'hi-IN'; // Default
+  let originalLanguage = 'en-US'; // Default original lang
+  let translatedLanguage = 'hi-IN'; // Default transalated lang
 
   ws.on('message', async (data) => {
+    console.log('Received message. Current recognizeStream:', recognizeStream);
+    console.log('Negated recognizeStream value:', !recognizeStream);
     try {
       // Check if the incoming data is JSON (for language config updates)
       const parsedData = JSON.parse(data);
@@ -83,6 +85,7 @@ wss.on('connection', (ws) => {
     
     // Initialize recognizeStream if it's null
     if (!recognizeStream) {
+      console.log('Initializing new recognizeStream...');
       try {
         recognizeStream = speechClient
           .streamingRecognize({
@@ -102,8 +105,7 @@ wss.on('connection', (ws) => {
               // Translate and generate TTS audio
               const translatedText = await translateText(transcription, translatedLanguage);
               const ttsAudioBase64 = await generateTTS(translatedText, translatedLanguage);
-              // Debug
-              console.log('recognizeStream value:', !recognizeStream);
+              
               // Send results back to the client
               ws.send(JSON.stringify({
                 original: transcription,
@@ -117,7 +119,6 @@ wss.on('connection', (ws) => {
           })
           .on('error', (error) => {
             console.error('Error during streaming:', error);
-            ws.send(JSON.stringify({ error: error.message }));
             recognizeStream = null;
           })
           .on('end', () => {
@@ -127,12 +128,13 @@ wss.on('connection', (ws) => {
       } catch (streamError) {
         console.error('Error initializing recognizeStream:', streamError);
         ws.send(JSON.stringify({ error: streamError.message }));
+        recognizeStream = null;
       }
     }
 
     // If recognizeStream is active, write the audio buffer to it
     // Debug
-    console.log("If recognizeStream: ", !recognizeStream);
+    console.log("If recognizeStream1: ", !recognizeStream);
     if (recognizeStream) {
       try {
         recognizeStream.write(audioBuffer);
@@ -144,7 +146,10 @@ wss.on('connection', (ws) => {
   });
   ws.on('close', () => {
     console.log('WebSocket client disconnected');
-    if (recognizeStream) recognizeStream.end();
+    if (recognizeStream){
+      recognizeStream.end();
+      recognizeStream = null;
+    }
   });
 });
 

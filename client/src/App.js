@@ -80,10 +80,10 @@ const AudioRecorder = () => {
       micButton.classList.add('pulse');
 
 
-      // Auto-stop after 5 seconds
+      // Auto-stop
       timerRef.current = setTimeout(() => {
         stopRecording();
-      }, 5000);
+      }, 2000);
 
     } catch (err) {
       console.error('Error accessing microphone:', err);

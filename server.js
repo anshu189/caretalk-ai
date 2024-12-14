@@ -38,7 +38,7 @@ app.get('/api/health', (req, res) => {
   res.send({ status: 'ok', message: 'caretalkai is healthy.' });
 });
 
-// Fallback: for any other route, serve the React index.html
+// Fallback: for any other route
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
 });
@@ -50,8 +50,7 @@ const server = app.listen(PORT, () => {
 });
 
 // ============ WEBSOCKET SERVER ============
-const wss = new WebSocketServer({ server }); // Attach to the same HTTP server
-console.log('WebSocket server attached.');
+const wss = new WebSocketServer({ server })
 
 // Setup real-time transcription & translation
 wss.on('connection', (ws) => {
@@ -83,8 +82,6 @@ wss.on('connection', (ws) => {
 
     // Initialize recognizeStream if it's null
     if (!recognizeStream) {
-      console.log('Google Credentials:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
-      console.log('Initializing new recognizeStream...');
       try {
         recognizeStream = speechClient
           .streamingRecognize({
@@ -106,7 +103,6 @@ wss.on('connection', (ws) => {
               // Translate and generate TTS audio
               const translatedText = await translateText(transcription, translatedLanguage);
               const ttsAudioBase64 = await generateTTS(translatedText, translatedLanguage);
-              console.log("transcription: ",transcription)
 
               // Send results back to the client
               ws.send(JSON.stringify({
@@ -135,9 +131,6 @@ wss.on('connection', (ws) => {
     }
 
     // If recognizeStream is active, write the audio buffer to it
-    // Debug
-    console.log('Audio Buffer Size:', audioBuffer.length);
-    console.log('Audio Buffer Data (first 10 bytes):', audioBuffer.slice(0, 10));
     if (recognizeStream) {
       try {
         recognizeStream.write(audioBuffer);

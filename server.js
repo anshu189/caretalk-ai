@@ -61,7 +61,6 @@ wss.on('connection', (ws) => {
   let translatedLanguage = 'hi-IN'; // Default transalated lang
 
   ws.on('message', async (data) => {
-    console.log('Received message. Current recognizeStream:', recognizeStream);
     console.log('Negated recognizeStream value:', !recognizeStream);
     try {
       // Check if the incoming data is JSON (for language config updates)
@@ -97,7 +96,9 @@ wss.on('connection', (ws) => {
             interimResults: true,
           })
           .on('data', async (response) => {
+            console.log("out data")
             try {
+              console.log("in data")
               const transcription = response.results
                 .map((result) => result.alternatives[0].transcript)
                 .join('\n');
@@ -106,8 +107,6 @@ wss.on('connection', (ws) => {
               const translatedText = await translateText(transcription, translatedLanguage);
               const ttsAudioBase64 = await generateTTS(translatedText, translatedLanguage);
               console.log("transcription: ",transcription)
-              console.log("translatedText: ",translatedText)
-              console.log("ttsAudioBase64: ",ttsAudioBase64)
 
               // Send results back to the client
               ws.send(JSON.stringify({
@@ -136,8 +135,6 @@ wss.on('connection', (ws) => {
     }
 
     // If recognizeStream is active, write the audio buffer to it
-    // Debug
-    console.log("If recognizeStream1: ", !recognizeStream);
     if (recognizeStream) {
       try {
         recognizeStream.write(audioBuffer);

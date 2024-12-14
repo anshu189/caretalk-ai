@@ -18,13 +18,13 @@ if (!process.env.OPENAI_API_KEY || !process.env.GOOGLE_APPLICATION_CREDENTIALS) 
 }
 
 // Set the credentials for Google Cloud
-process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+// process.env.GOOGLE_APPLICATION_CREDENTIALS = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 
 const app = express();
 app.use(cors());
 
 // Initialize Clients
-const speechClient = new speech.SpeechClient();
+const speechClient = new speech.SpeechClient({ keyFilename: './google_tts_stt_API_KEY.json' });
 const textToSpeechClient = new textToSpeech.TextToSpeechClient();
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -61,7 +61,6 @@ wss.on('connection', (ws) => {
 
   ws.on('message', async (data) => {
     try {
-      // Check if the incoming data is JSON (for language config updates)
       const parsedData = JSON.parse(data);
       if (parsedData.originalLanguage && parsedData.translatedLanguage) {
         originalLanguage = parsedData.originalLanguage;

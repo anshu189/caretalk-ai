@@ -87,7 +87,7 @@ const AudioRecorder = () => {
       const checkSilence = () => {
         analyser.getByteFrequencyData(dataArray);
         const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
-        if (average < 10) { // Silence threshold
+        if (average < 20) { // Silence threshold
           if (!silenceStartTime) silenceStartTime = Date.now();
           if (Date.now() - silenceStartTime > 2000) { // 2 seconds of silence
             stopRecording();

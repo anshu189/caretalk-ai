@@ -85,24 +85,21 @@ const AudioRecorder = () => {
 
       // Silence detection logic
       const checkSilence = () => {
-        console.log("Checking silence...");
         analyser.getByteFrequencyData(dataArray);
         const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
-        console.log("Freq: ",average)
         if (average < 10) { // Silence threshold
           if (!silenceStartTime) silenceStartTime = Date.now();
           if (Date.now() - silenceStartTime > 2000) { // 2 seconds of silence
             stopRecording();
-            console.log("Stopped recording due to silence.");
           }
         } else {
-          silenceStartTime = null; // Reset silence timer if sound detected
+          silenceStartTime = null;
         }
 
         if (isRecording) requestAnimationFrame(checkSilence);
       };
 
-      checkSilence();
+      setInterval(checkSilence, 100);
 
       // Add pulse animation to microphone button
       const micButton = document.querySelector('.mic-button');

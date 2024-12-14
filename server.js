@@ -95,7 +95,7 @@ wss.on('connection', (ws) => {
           .on('data', async (response) => {
             console.log("Data event received");
             try {
-              console.log('Transcription response:', response);
+              // console.log('Transcription response:', response);
               const transcription = response.results
                 .map((result) => result.alternatives[0].transcript)
                 .join('\n');
@@ -159,7 +159,7 @@ async function translateText(text, targetLanguage) {
       messages: [
         {
           role: "user",
-          content: `Translate the following text into ${targetLanguage}: ${text}`,
+          content: `Translate the following text into ${targetLanguage} and ensure all medical terms are accurately translated. If any medical terms are mispronounced or used incorrectly, apply your most accurate and advanced updated generative AI models to correct them while keeping the translation strictly in the requested language. \n\nOriginal Text: ${text} \n\nText: ${text}`,
         }
       ],
       temperature: 1,

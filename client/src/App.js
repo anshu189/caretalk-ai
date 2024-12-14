@@ -25,6 +25,18 @@ const AudioRecorder = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
 
+      // Auto Detection for mic
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      let silenceStartTime = null;
+
+      source.connect(analyser);
+
       // Connect to WebSocket (LOCAL DEV: ws://localhost:5000)
       const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
       const host = window.location.host;
@@ -32,15 +44,11 @@ const AudioRecorder = () => {
 
       wsRef.current.onopen = () => {
         console.log('WebSocket connection opened');
-        // Send selected languages to the server
         wsRef.current.send(JSON.stringify({ originalLanguage, translatedLanguage }));
       };
 
       wsRef.current.onmessage = (event) => {
         const { original, translated, ttsAudioBase64, error } = JSON.parse(event.data);
-
-        console.log("Event: ",event)
-
         if (error) {
           console.error('Error received from server:', error);
         } else {
@@ -75,15 +83,30 @@ const AudioRecorder = () => {
       mediaRecorderRef.current = mediaRecorder;
       setIsRecording(true);
 
+      // Silence detection logic
+      const checkSilence = () => {
+        console.log("Checking silence...");
+        analyser.getByteFrequencyData(dataArray);
+        const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
+        console.log("Freq: ",average)
+        if (average < 10) { // Silence threshold
+          if (!silenceStartTime) silenceStartTime = Date.now();
+          if (Date.now() - silenceStartTime > 2000) { // 2 seconds of silence
+            stopRecording();
+            console.log("Stopped recording due to silence.");
+          }
+        } else {
+          silenceStartTime = null; // Reset silence timer if sound detected
+        }
+
+        if (isRecording) requestAnimationFrame(checkSilence);
+      };
+
+      checkSilence();
+
       // Add pulse animation to microphone button
       const micButton = document.querySelector('.mic-button');
       micButton.classList.add('pulse');
-
-
-      // Auto-stop
-      timerRef.current = setTimeout(() => {
-        stopRecording();
-      }, 2000);
 
     } catch (err) {
       console.error('Error accessing microphone:', err);

@@ -105,7 +105,10 @@ wss.on('connection', (ws) => {
               // Translate and generate TTS audio
               const translatedText = await translateText(transcription, translatedLanguage);
               const ttsAudioBase64 = await generateTTS(translatedText, translatedLanguage);
-              
+              console.log("transcription: ",transcription)
+              console.log("translatedText: ",translatedText)
+              console.log("ttsAudioBase64: ",ttsAudioBase64)
+
               // Send results back to the client
               ws.send(JSON.stringify({
                 original: transcription,

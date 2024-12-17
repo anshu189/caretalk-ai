@@ -281,14 +281,13 @@ const AudioRecorder = () => {
                 disabled={!storedAudio}
               >
                 <img src={speakericon} alt="Speak" className='invert size-5'/>
-                {/* Speak */}
               </button>
         </div>
 
         {/* Footer */}
         <footer className="mt-5 lg:mt-12 flex items-center justify-center gap-10 text-white">
           <a
-            href="https://github.com/anshu189/caretalkai"
+            href="https://github.com/anshu189/caretalk-ai"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2"

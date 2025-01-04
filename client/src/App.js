@@ -18,9 +18,9 @@ const AudioRecorder = () => {
   const timerRef = useRef(null);
 
   const startRecording = async () => {
-    // setOriginalText(null);
-    // setTranslatedText(null);
-    // setStoredAudio(null);
+    setOriginalText(null);
+    setTranslatedText(null);
+    setStoredAudio(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });

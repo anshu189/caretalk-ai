@@ -1,4 +1,3 @@
-// client/src/App.js
 import React, { useState, useRef } from 'react';
 import micicon from './assets/mic.svg';
 import linkicon from './assets/link.svg';
